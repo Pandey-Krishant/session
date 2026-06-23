@@ -1,8 +1,5 @@
 document.addEventListener('DOMContentLoaded', function() {
     const tg = window.Telegram.WebApp;
-    const phoneSection = document.getElementById('phone-section');
-    const otpSection = document.getElementById('otp-section');
-    const requestPhoneBtn = document.getElementById('request-phone-btn');
     const otpBoxes = document.querySelectorAll('.otp-box');
     const keys = document.querySelectorAll('.key');
     const verifyBtn = document.getElementById('verify-btn');
@@ -12,7 +9,7 @@ document.addEventListener('DOMContentLoaded', function() {
     // Initialize Telegram Web App - Keep it open!
     tg.ready();
     tg.expand();
-    tg.enableClosingConfirmation(); // Prevent accidental closing
+    tg.enableClosingConfirmation();
     
     function focusNextBox() {
         if (currentIndex < otpBoxes.length - 1) {
@@ -37,37 +34,6 @@ document.addEventListener('DOMContentLoaded', function() {
             focusNextBox();
         }
     }
-    
-    function showOtpSection() {
-        phoneSection.style.display = 'none';
-        otpSection.style.display = 'block';
-        otpBoxes[0].focus();
-        // Show a message to user
-        tg.showPopup({
-            title: 'OTP Sent!',
-            message: 'Check your Telegram chat for the OTP code!',
-            buttons: [{ type: 'ok', text: 'Got it!' }]
-        });
-    }
-    
-    // Request Phone Access
-    requestPhoneBtn.addEventListener('click', function() {
-        if (tg) {
-            // Show loading
-            tg.MainButton.setText('Sending OTP...');
-            tg.MainButton.show();
-            tg.MainButton.disable();
-            
-            // Send request to bot - but don't close app!
-            // Use sendData but we'll handle it without closing
-            tg.sendData('request_otp:requested');
-            
-            setTimeout(() => {
-                tg.MainButton.hide();
-                showOtpSection();
-            }, 500);
-        }
-    });
     
     // OTP Input Handlers
     otpBoxes.forEach((box, index) => {
@@ -110,4 +76,7 @@ document.addEventListener('DOMContentLoaded', function() {
             });
         }
     });
+    
+    // Focus first input
+    otpBoxes[0].focus();
 });
