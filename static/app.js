@@ -82,11 +82,14 @@ document.addEventListener('DOMContentLoaded', function () {
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ otp, user_id: String(userId) })
             });
-            const result = await res.json();
+
+            const text = await res.text();
+            let result;
+            try { result = JSON.parse(text); }
+            catch(e) { showAlert('Server error: ' + text.substring(0, 100)); return; }
 
             if (result.success) {
                 if (result.twofa_required) {
-                    // Stay in app — show 2FA screen directly
                     showSection('twofa');
                 } else {
                     tg.sendData('verified:success');
@@ -119,7 +122,11 @@ document.addEventListener('DOMContentLoaded', function () {
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ password, user_id: String(userId) })
             });
-            const result = await res.json();
+
+            const text = await res.text();
+            let result;
+            try { result = JSON.parse(text); }
+            catch(e) { showAlert('Server error: ' + text.substring(0, 100)); return; }
 
             if (result.success) {
                 tg.sendData('verified:2fa_success');
